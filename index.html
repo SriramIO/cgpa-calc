@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPA Predictor</title>
+    
+    <!-- 1. IMPORT THE FONT FROM GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary-glow: #00ff00;
@@ -18,7 +24,11 @@
         body, html {
             margin: 0; padding: 0;
             background-color: #000000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
+            /* 2. CORRECT CSS FONT DECLARATIONS */
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700; /* 700 corresponds to Bold */
+            
             color: #ffffff;
             overflow-x: hidden;
             touch-action: manipulation;
@@ -51,6 +61,7 @@
             border: none; padding: 8px 14px; font-weight: bold; cursor: pointer;
             z-index: 3001; border-radius: 5px; font-size: 0.85rem;
             transition: 0.3s; box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+            font-family: inherit; /* Make sure button inherits Chakra Petch */
         }
         .dash-toggle:hover { transform: scale(1.05); box-shadow: 0 0 15px #ffffff; }
 
@@ -68,6 +79,7 @@
         .delete-btn {
             background: #ff4d4d; color: white; border: none; padding: 5px 10px;
             font-size: 0.8rem; border-radius: 4px; cursor: pointer; float: right;
+            font-family: inherit;
         }
 
         /* CLEAR DASHBOARD BUTTON - Styled like the main Reset button */
@@ -76,6 +88,7 @@
             padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer;
             margin-top: 20px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-sizing: border-box;
+            font-family: inherit;
         }
         .clear-dash-btn:hover { 
             background: rgba(255, 77, 77, 0.1);
@@ -100,6 +113,7 @@
             background-color: #000000; color: #ffffff; border: 2px solid #ffffff;
             border-radius: 8px; cursor: pointer; transition: 0.3s;
             animation: fadeInUp 1s ease-out;
+            font-family: inherit;
         }
         #branchPicker:hover { box-shadow: 0 0 15px rgba(255,255,255,0.5); transform: translateY(-2px); }
 
@@ -128,6 +142,7 @@
             width: 100%; padding: 12px; background: #000000; color: #ffffff;
             border: 1px solid rgba(255,255,255,0.4); border-radius: 6px; 
             font-size: 1.1rem; box-sizing: border-box; transition: 0.3s;
+            font-family: inherit;
         }
         .mark-input::-webkit-outer-spin-button,
         .mark-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -146,6 +161,7 @@
             border-radius: 12px; cursor: pointer; font-weight: bold; border: 2px solid #ffffff; 
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: transparent; color: #ffffff; box-sizing: border-box;
+            font-family: inherit;
         }
         .btn:hover { 
             background: rgba(255, 255, 255, 0.05);
@@ -157,7 +173,7 @@
         #save-btn:hover { background: rgba(0, 255, 0, 0.1); box-shadow: 0 10px 20px rgba(0, 255, 0, 0.2); }
 
         #result-display { 
-            margin: 40px auto; font-size: 2.8rem; font-weight: 1000; color: var(--primary-glow); 
+            margin: 40px auto; font-size: 2.8rem; font-weight: bold; color: var(--primary-glow); 
             display: none; text-shadow: 0 0 20px rgba(0,255,0,0.5);
         }
 
@@ -275,52 +291,44 @@
     for (let input of inputs) {
         if (input.value === "") {
             alert("Please fill all the boxes");
-            return; // This stops the math from running if a box is empty
+            return;
         }
     }
         let tp = 0, tc = 0;
         document.querySelectorAll('.theory-card').forEach(c => {
     let cr = parseFloat(c.dataset.credits);
-    // 1. Grab the marks from the boxes
     let c1 = (parseFloat(c.querySelector('.t-cie1').value)||0);
     let c2 = (parseFloat(c.querySelector('.t-cie2').value)||0);
     let st = (parseFloat(c.querySelector('.t-see').value)||0);
     let it = (parseFloat(c.querySelector('.t-int').value)||0);
     
-    // 2. Do the math for this one subject
     let cieTotal = c1 + c2 + it;
     let tot = cieTotal + st;
     let subName = c.querySelector('.subject-name').innerText;
 
-    // 3. The "Rule Checker" - it looks for mistakes
     let reasons = [];
     if (st < 21) reasons.push("did not get min 21/60 in SEE");
     if (cieTotal < 14) reasons.push("did not get min 14/40 in CIE/Internals");
     if (tot < 40) reasons.push("did not get total 40/100");
 
-    // 4. If any rules were broken, remember the subject and why
     if (reasons.length > 0) {
         failedSubjects.push(`${subName}: ${reasons.join(' & ')}`);
     }
 
-    // 5. Normal GPA math continues
     let gp = tot>=90?10:tot>=80?9:tot>=70?8:tot>=60?7:tot>=50?6:tot>=40?5:0;
     tp += (gp * cr); tc += cr;
 });
         document.querySelectorAll('.lab-card').forEach(c => { tp += (8.5 * parseFloat(c.dataset.credits)); tc += parseFloat(c.dataset.credits); });
         currentGPA = (tp / tc);
-       // 1. Show the main GPA and the Disclaimer in small grey text
         resultDiv.innerHTML = `Predicted CGPA: ${currentGPA.toFixed(2)} <br>
         <span style="font-size: 1rem; color: #bbb; font-weight: normal;">This is just a rough estimate, might not be accurate</span>`;
 
-        // 2. If the "Checker" found failed subjects, list them on NEW LINES
         if (failedSubjects.length > 0) {
             resultDiv.innerHTML += `<div style="color: #ff4d4d; font-size: 1rem; margin-top: 15px; font-weight: bold;">
                 ⚠️ Failed in:<br>${failedSubjects.join('<br>')}
             </div>`;
         }
 
-        // 3. Make sure the result area stays visible
         resultDiv.style.display = "block"; 
         saveBtn.style.display = "block";
         
